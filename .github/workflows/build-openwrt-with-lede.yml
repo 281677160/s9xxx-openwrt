@@ -70,6 +70,7 @@ env:
   REPO_BRANCH: master
   FEEDS_CONF: router-config/lede-master/feeds.conf.default
   CONFIG_FILE: router-config/lede-master/.config
+  COME_BACK: router-config/lede-master/come-back/start
   DIY_P1_SH: router-config/lede-master/diy-part1.sh
   DIY_P2_SH: router-config/lede-master/diy-part2.sh
   TZ: America/New_York
