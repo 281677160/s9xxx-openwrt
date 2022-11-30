@@ -16,6 +16,10 @@ on:
   
   workflow_dispatch:
     inputs:
+      cpu:
+        description: "cpu优选"
+        required: false
+        default: ''
       openwrt_board:
         description: "Select Amlogic board"
         required: false
