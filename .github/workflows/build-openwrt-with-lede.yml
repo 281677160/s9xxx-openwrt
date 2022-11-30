@@ -12,7 +12,7 @@ on:
     branches:
       - main
     paths:
-      - 'build/Lede/start-up/start'
+      - 'router-config/lede-master/come-back/start'
   
   workflow_dispatch:
     inputs:
@@ -70,7 +70,7 @@ env:
   REPO_BRANCH: master
   FEEDS_CONF: router-config/lede-master/feeds.conf.default
   CONFIG_FILE: router-config/lede-master/.config
-  COME_BACK: router-config/lede-master/come-back/start
+  COME_BACK: router-config/lede-master/come-back
   DIY_P1_SH: router-config/lede-master/diy-part1.sh
   DIY_P2_SH: router-config/lede-master/diy-part2.sh
   TZ: America/New_York
@@ -103,6 +103,20 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           echo "status=success" >> ${GITHUB_OUTPUT}
+          
+      - name: CPU检测(E5系列CPU则重新编译)
+        run: |
+          export cpu_model==`cat /proc/cpuinfo  |grep 'model name' |gawk -F : '{print $2}' | uniq -c  | sed 's/^ \+[0-9]\+ //g'`
+          if [[ `echo "${cpu_model}" |grep -c "E5"` -ge '1' ]]; then
+            git clone -b main https://github.com/${{github.repository}}.git ${REPO_BRANCH}
+            mkdir -p ${COME_BACK}
+            echo "$(date +%Y年%m月%d号%H时%M分%S秒)" > ${COME_BACK}/start
+            cd ${REPO_BRANCH}
+            git add .
+            git commit -m "E5系统CPU-重新启动${{ github.event.inputs.openwrt_board }}编译"
+            git push --force "https://${{ secrets.REPO_TOKEN }}@github.com/${{github.repository}}" HEAD:main
+            exit 1
+          fi
 
       - name: Clone source code
         working-directory: /workdir
