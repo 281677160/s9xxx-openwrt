@@ -119,27 +119,41 @@ jobs:
           cd ${GITHUB_WORKSPACE}
           export cpu_model=`cat /proc/cpuinfo  |grep 'model name' |gawk -F : '{print $2}' | uniq -c  | sed 's/^ \+[0-9]\+ //g'`
           echo "当前CPU型号：${cpu_model}"
-          if [[ "${{ github.event.inputs.cpu }}" == "Exclude_E5" ]]; then
+          if [[ -z "${{ github.event.inputs.cpu }}" ]]; then
+            export cpuyouxuan="Exclude_E5"
+          else
+            export cpuyouxuan="${{ github.event.inputs.cpu }}"
+          fi
+          
+          if [[ "${cpuyouxuan}" == "Exclude_E5" ]]; then
             if [[ `echo "${cpu_model}" |grep -c "E5"` -ge '1' ]]; then
-              git clone -b main https://github.com/${{github.repository}}.git lede
-              cd lede
-              mkdir -p router-config/lede-master/come-back
-              echo "$(date +%Y年%m月%d号%H时%M分%S秒)" > router-config/lede-master/come-back/start
+              git clone -b main https://github.com/${{github.repository}}.git ${REPO_BRANCH}
+              cd ${REPO_BRANCH}
+              mkdir -p ${COME_BACK}
+              echo "$(date +%Y年%m月%d号%H时%M分%S秒)" > ${COME_BACK}/start
               git add .
               git commit -m "E5系CPU-重新启动编译"
               git push --force "https://${{ secrets.REPO_TOKEN }}@github.com/${{github.repository}}" HEAD:main
               exit 1
              fi
           else
-            if [[ `echo "${cpu_model}" |grep -c "${{ github.event.inputs.cpu }}"` -eq '0' ]]; then
-              git clone -b main https://github.com/${{github.repository}}.git ${{env.REPO_BRANCH}}
-              export ymllu="${{env.REPO_BRANCH}}/.github/workflows/build-openwrt-with-lede.yml"
-              export TARGET1="$(grep -Eo "default: \".*\"" "${ymllu}" |awk 'NR==1' |sed 's/\"/\\&/g')"
-              export TARGET2="default: \\\"${{ github.event.inputs.cpu }}\\\""
-              sed -i "s?${TARGET1}?${TARGET2}?g" "${ymllu}"
-              cd ${{env.REPO_BRANCH}}
-              mkdir -p ${{env.COME_BACK}}
-              echo "$(date +%Y年%m月%d号%H时%M分%S秒)" > ${{env.COME_BACK}}/start
+            if [[ `echo "${cpu_model}" |grep -c "${cpuyouxuan}"` -eq '0' ]]; then
+              git clone -b main https://github.com/${{github.repository}}.git ${REPO_BRANCH}
+              export yml_path="${REPO_BRANCH}/.github/workflows/build-openwrt-with-lede.yml"
+              export TARGET1="$(grep -Eo "default: \".*\"" "${yml_path}" |awk 'NR==1' |sed 's/\"/\\&/g')"
+              export TARGET2="default: \\\"${cpuyouxuan}\\\""
+              export PATHS1="$(grep -Eo "\- '.*'" "${yml_path}" |sed 's/^[ ]*//g' |grep -v "^#" |awk 'NR==1')"
+              export PATHS2="- '${COME_BACK}/start'"
+              if [[ -n ${TARGET1} ]] && [[ -n ${PATHS1} ]]; then
+                sed -i "s?${TARGET1}?${TARGET2}?g" "${yml_path}"
+                sed -i "s?${PATHS1}?${PATHS2}?g" "${yml_path}"
+              else
+                echo "获取变量失败,请检查build-openwrt-with-lede.yml文件"
+                exit 1
+              fi
+              cd ${REPO_BRANCH}
+              mkdir -p ${COME_BACK}
+              echo "$(date +%Y年%m月%d号%H时%M分%S秒)" > ${COME_BACK}/start
               git add .
               git commit -m "非${{ github.event.inputs.cpu }}CPU-重新启动编译"
               git push --force "https://${{ secrets.REPO_TOKEN }}@github.com/${{github.repository}}" HEAD:main
