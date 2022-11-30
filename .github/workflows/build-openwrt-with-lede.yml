@@ -127,8 +127,8 @@ jobs:
           
           if [[ "${cpuyouxuan}" == "Exclude_E5" ]]; then
             if [[ `echo "${cpu_model}" |grep -c "E5"` -ge '1' ]]; then
-              git clone -b main https://github.com/${{github.repository}}.git ${REPO_BRANCH}
-              cd ${REPO_BRANCH}
+              git clone -b main https://github.com/${{github.repository}}.git lede
+              cd lede
               mkdir -p ${COME_BACK}
               echo "$(date +%Y年%m月%d号%H时%M分%S秒)" > ${COME_BACK}/start
               git add .
@@ -138,8 +138,8 @@ jobs:
              fi
           else
             if [[ `echo "${cpu_model}" |grep -c "${cpuyouxuan}"` -eq '0' ]]; then
-              git clone -b main https://github.com/${{github.repository}}.git ${REPO_BRANCH}
-              export yml_path="${REPO_BRANCH}/.github/workflows/build-openwrt-with-lede.yml"
+              git clone -b main https://github.com/${{github.repository}}.git lede
+              export yml_path="lede/.github/workflows/build-openwrt-with-lede.yml"
               export TARGET1="$(grep -Eo "default: \".*\"" "${yml_path}" |awk 'NR==1' |sed 's/\"/\\&/g')"
               export TARGET2="default: \\\"${cpuyouxuan}\\\""
               export PATHS1="$(grep -Eo "\- '.*'" "${yml_path}" |sed 's/^[ ]*//g' |grep -v "^#" |awk 'NR==1')"
@@ -151,7 +151,7 @@ jobs:
                 echo "获取变量失败,请检查build-openwrt-with-lede.yml文件"
                 exit 1
               fi
-              cd ${REPO_BRANCH}
+              cd lede
               mkdir -p ${COME_BACK}
               echo "$(date +%Y年%m月%d号%H时%M分%S秒)" > ${COME_BACK}/start
               git add .
