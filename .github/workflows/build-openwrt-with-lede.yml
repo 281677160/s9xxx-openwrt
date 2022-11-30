@@ -20,6 +20,12 @@ on:
         description: "cpu优选"
         required: false
         default: ''
+        type: choice
+        options:
+          - 8370C
+          - 8272CL
+          - 8171M
+          - E5
       openwrt_board:
         description: "Select Amlogic board"
         required: false
