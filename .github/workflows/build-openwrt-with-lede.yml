@@ -17,19 +17,19 @@ on:
   workflow_dispatch:
     inputs:
       cpu:
-        description: "cpu优选"
+        description: 'cpu优选'
         required: false
-        default: "8171M"
+        default: '弃用E5'
         type: choice
         options:
-          - Exclude_E5
-          - 8370C
-          - 8272CL
-          - 8171M
+          - '弃用E5'
+          - '8370C'
+          - '8272CL'
+          - '8171M'
       openwrt_board:
         description: "Select Amlogic board"
         required: false
-        default: "8370C"
+        default: "all"
         type: choice
         options:
           - all
@@ -120,12 +120,12 @@ jobs:
           export cpu_model=`cat /proc/cpuinfo  |grep 'model name' |gawk -F : '{print $2}' | uniq -c  | sed 's/^ \+[0-9]\+ //g'`
           echo "当前CPU型号：${cpu_model}"
           if [[ -z "${{ github.event.inputs.cpu }}" ]]; then
-            export cpu_selection="Exclude_E5"
+            export cpu_selection="弃用E5"
           else
             export cpu_selection="${{ github.event.inputs.cpu }}"
           fi
           
-          if [[ "${cpuyouxuan}" == "Exclude_E5" ]]; then
+          if [[ "${cpu_selection}" == "弃用E5" ]]; then
             if [[ `echo "${cpu_model}" |grep -c "E5"` -ge '1' ]]; then
               git clone -b main https://github.com/${{github.repository}}.git lede
               cd lede
