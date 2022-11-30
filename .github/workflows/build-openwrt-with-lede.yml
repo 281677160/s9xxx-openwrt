@@ -120,9 +120,9 @@ jobs:
           export cpu_model=`cat /proc/cpuinfo  |grep 'model name' |gawk -F : '{print $2}' | uniq -c  | sed 's/^ \+[0-9]\+ //g'`
           echo "当前CPU型号：${cpu_model}"
           if [[ -z "${{ github.event.inputs.cpu }}" ]]; then
-            export cpuyouxuan="Exclude_E5"
+            export cpu_selection="Exclude_E5"
           else
-            export cpuyouxuan="${{ github.event.inputs.cpu }}"
+            export cpu_selection="${{ github.event.inputs.cpu }}"
           fi
           
           if [[ "${cpuyouxuan}" == "Exclude_E5" ]]; then
@@ -130,18 +130,18 @@ jobs:
               git clone -b main https://github.com/${{github.repository}}.git lede
               cd lede
               mkdir -p ${COME_BACK}
-              echo "$(date +%Y年%m月%d号%H时%M分%S秒)" > ${COME_BACK}/start
+              echo "$(date +%Y%m%d%H%M%S)" > ${COME_BACK}/start
               git add .
               git commit -m "重新启动编译"
               git push --force "https://${{ secrets.REPO_TOKEN }}@github.com/${{github.repository}}" HEAD:main
               exit 1
              fi
           else
-            if [[ `echo "${cpu_model}" |grep -c "${cpuyouxuan}"` -eq '0' ]]; then
+            if [[ `echo "${cpu_model}" |grep -c "${cpu_selection}"` -eq '0' ]]; then
               git clone -b main https://github.com/${{github.repository}}.git lede
               export yml_path="lede/.github/workflows/build-openwrt-with-lede.yml"
               export TARGET1="$(grep -Eo "default: \".*\"" "${yml_path}" |awk 'NR==1' |sed 's/\"/\\&/g')"
-              export TARGET2="default: \\\"${cpuyouxuan}\\\""
+              export TARGET2="default: \\\"${cpu_selection}\\\""
               export PATHS1="$(grep -Eo "\- '.*'" "${yml_path}" |sed 's/^[ ]*//g' |grep -v "^#" |awk 'NR==1')"
               export PATHS2="- '${COME_BACK}/start'"
               if [[ -n ${TARGET1} ]] && [[ -n ${PATHS1} ]]; then
@@ -153,7 +153,7 @@ jobs:
               fi
               cd lede
               mkdir -p ${COME_BACK}
-              echo "$(date +%Y年%m月%d号%H时%M分%S秒)" > ${COME_BACK}/start
+              echo "$(date +%Y%m%d%H%M%S)" > ${COME_BACK}/start
               git add .
               git commit -m "重新启动编译"
               git push --force "https://${{ secrets.REPO_TOKEN }}@github.com/${{github.repository}}" HEAD:main
