@@ -116,7 +116,7 @@ jobs:
           
       - name: CPU检测(E5系列CPU则重新编译)
         run: |
-          export cpu_model==`cat /proc/cpuinfo  |grep 'model name' |gawk -F : '{print $2}' | uniq -c  | sed 's/^ \+[0-9]\+ //g'`
+          export cpu_model=`cat /proc/cpuinfo  |grep 'model name' |gawk -F : '{print $2}' | uniq -c  | sed 's/^ \+[0-9]\+ //g'`
           echo "当前CPU型号：${cpu_model}"
           if [[ "${{ github.event.inputs.cpu }}" == "all" ]]; then
             if [[ `echo "${cpu_model}" |grep -c "E5"` -ge '1' ]]; then
