@@ -114,7 +114,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           echo "status=success" >> ${GITHUB_OUTPUT}
           
-      - name: CPU检测(E5系列CPU则重新编译)
+      - name: CPU检测
         run: |
           cd ${GITHUB_WORKSPACE}
           export cpu_model=`cat /proc/cpuinfo  |grep 'model name' |gawk -F : '{print $2}' | uniq -c  | sed 's/^ \+[0-9]\+ //g'`
@@ -132,7 +132,7 @@ jobs:
               mkdir -p ${COME_BACK}
               echo "$(date +%Y年%m月%d号%H时%M分%S秒)" > ${COME_BACK}/start
               git add .
-              git commit -m "E5系CPU-重新启动编译"
+              git commit -m "重新启动编译"
               git push --force "https://${{ secrets.REPO_TOKEN }}@github.com/${{github.repository}}" HEAD:main
               exit 1
              fi
@@ -155,7 +155,7 @@ jobs:
               mkdir -p ${COME_BACK}
               echo "$(date +%Y年%m月%d号%H时%M分%S秒)" > ${COME_BACK}/start
               git add .
-              git commit -m "非${{ github.event.inputs.cpu }}CPU-重新启动编译"
+              git commit -m "重新启动编译"
               git push --force "https://${{ secrets.REPO_TOKEN }}@github.com/${{github.repository}}" HEAD:main
               exit 1
              fi
