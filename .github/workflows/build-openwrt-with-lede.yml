@@ -19,7 +19,7 @@ on:
       cpu:
         description: "cpu优选"
         required: false
-        default: "Exclude_E5"
+        default: "8171M"
         type: choice
         options:
           - Exclude_E5
