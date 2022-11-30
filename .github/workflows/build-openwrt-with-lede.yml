@@ -128,14 +128,17 @@ jobs:
           if [[ "${cpu_selection}" == "弃用E5" ]]; then
             if [[ `echo "${cpu_model}" |grep -c "E5"` -ge '1' ]]; then
               git clone -b main https://github.com/${{github.repository}}.git lede
-              cd lede
-              mkdir -p ${COME_BACK}
-              echo "$(date +%Y%m%d%H%M%S)" > ${COME_BACK}/start
-              git add .
-              git commit -m "重新启动编译"
-              git push --force "https://${{ secrets.REPO_TOKEN }}@github.com/${{github.repository}}" HEAD:main
-              exit 1
-             fi
+              export yml_path="lede/.github/workflows/build-openwrt-with-lede.yml"
+              export PATHS1="$(grep -Eo "\- '.*'" "${yml_path}" |sed 's/^[ ]*//g' |grep -v "^#" |awk 'NR==1')"
+              export PATHS2="- '${COME_BACK}/start'"
+              export Continue_selecting="1"
+              if [[ -n ${TARGET1} ]] && [[ -n ${PATHS1} ]]; then
+                sed -i "s?${PATHS1}?${PATHS2}?g" "${yml_path}"
+              else
+                echo "获取变量失败,请检查build-openwrt-with-lede.yml文件"
+                exit 1
+              fi
+            fi
           else
             if [[ `echo "${cpu_model}" |grep -c "${cpu_selection}"` -eq '0' ]]; then
               git clone -b main https://github.com/${{github.repository}}.git lede
@@ -144,6 +147,7 @@ jobs:
               export TARGET2="default: \\\"${cpu_selection}\\\""
               export PATHS1="$(grep -Eo "\- '.*'" "${yml_path}" |sed 's/^[ ]*//g' |grep -v "^#" |awk 'NR==1')"
               export PATHS2="- '${COME_BACK}/start'"
+              export Continue_selecting="1"
               if [[ -n ${TARGET1} ]] && [[ -n ${PATHS1} ]]; then
                 sed -i "s?${TARGET1}?${TARGET2}?g" "${yml_path}"
                 sed -i "s?${PATHS1}?${PATHS2}?g" "${yml_path}"
@@ -151,14 +155,16 @@ jobs:
                 echo "获取变量失败,请检查build-openwrt-with-lede.yml文件"
                 exit 1
               fi
-              cd lede
-              mkdir -p ${COME_BACK}
-              echo "$(date +%Y%m%d%H%M%S)" > ${COME_BACK}/start
-              git add .
-              git commit -m "重新启动编译"
-              git push --force "https://${{ secrets.REPO_TOKEN }}@github.com/${{github.repository}}" HEAD:main
-              exit 1
-             fi
+            fi
+          fi
+          if [[ "Continue_selecting" == "1" ]]; then
+            cd lede
+            mkdir -p ${COME_BACK}
+            echo "$(date +%Y%m%d%H%M%S)" > ${COME_BACK}/start
+            git add .
+            git commit -m "重新启动编译"
+            git push --force "https://${{ secrets.REPO_TOKEN }}@github.com/${{github.repository}}" HEAD:main
+            exit 1
           fi
 
       - name: Clone source code
