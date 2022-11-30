@@ -29,7 +29,7 @@ on:
       openwrt_board:
         description: "Select Amlogic board"
         required: false
-        default: "all"
+        default: "8370C"
         type: choice
         options:
           - all
