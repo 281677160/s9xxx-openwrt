@@ -144,9 +144,6 @@ jobs:
               export PATHS1="$(grep -Eo "\- '.*'" "${yml_path}" |sed 's/^[ ]*//g' |grep -v "^#" |awk 'NR==1')"
               export PATHS2="- '${COME_BACK}/start'"
               
-              export cpu2="cpu_selection\\=\\\"${cpu_youxuan}\\\""
-              sed -i "s?cpu_selection=.*?${cpu2}?g" "${yml_path}"
-              
               export Continue_selecting="1"
               if [[ -n ${TARGET1} ]] && [[ -n ${PATHS1} ]]; then
                 sed -i "s?${TARGET1}?${TARGET2}?g" "${yml_path}"
