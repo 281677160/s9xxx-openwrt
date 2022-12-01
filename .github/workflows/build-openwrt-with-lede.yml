@@ -114,9 +114,9 @@ jobs:
           git config --global user.name "github-actions[bot]"
           echo "status=success" >> ${GITHUB_OUTPUT}
           if [[ -z "${{ github.event.inputs.cpu }}" ]]; then
-            export cpu_youxuan="弃用E5"
+            echo "cpu_youxuan=弃用E5" >> ${GITHUB_ENV}
           else
-            export cpu_youxuan="${{ github.event.inputs.cpu }}"
+            echo "cpu_youxuan=${{ github.event.inputs.cpu }}" >> ${GITHUB_ENV}
           fi
           
       - name: CPU检测
