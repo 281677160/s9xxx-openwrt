@@ -154,7 +154,7 @@ jobs:
               fi
             fi
           fi
-          if [[ "Continue_selecting" == "1" ]]; then
+          if [[ "${Continue_selecting}" == "1" ]]; then
             cd lede
             mkdir -p ${COME_BACK}
             echo "$(date +%Y%m%d%H%M%S)" > ${COME_BACK}/start
