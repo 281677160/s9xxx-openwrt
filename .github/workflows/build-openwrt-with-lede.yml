@@ -113,17 +113,19 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           echo "status=success" >> ${GITHUB_OUTPUT}
+          if [[ -z "${{ github.event.inputs.cpu }}" ]]; then
+            export cpu_youxuan="弃用E5"
+          else
+            export cpu_youxuan="${{ github.event.inputs.cpu }}"
+          fi
           
       - name: CPU检测
         run: |
           cd ${GITHUB_WORKSPACE}
           export cpu_model=`cat /proc/cpuinfo  |grep 'model name' |gawk -F : '{print $2}' | uniq -c  | sed 's/^ \+[0-9]\+ //g'`
           echo "当前CPU型号：${cpu_model}"
-          if [[ -z "${{ github.event.inputs.cpu }}" ]]; then
-            export cpu_selection="弃用E5"
-          else
-            export cpu_selection="${{ github.event.inputs.cpu }}"
-          fi
+          
+          export cpu_selection="${cpu_youxuan}"
           
           if [[ "${cpu_selection}" == "弃用E5" ]]; then
             if [[ `echo "${cpu_model}" |grep -c "E5"` -ge '1' ]]; then
@@ -147,6 +149,11 @@ jobs:
               export TARGET2="default: \\\"${cpu_selection}\\\""
               export PATHS1="$(grep -Eo "\- '.*'" "${yml_path}" |sed 's/^[ ]*//g' |grep -v "^#" |awk 'NR==1')"
               export PATHS2="- '${COME_BACK}/start'"
+              
+              export cpu1="$(grep "cpu_selection=" "${yml_path}" |sed 's/^[ ]*//g' |grep -v '^#' |awk '{print $(2)}' |sed 's?=?\\&?g' |sed 's?"?\\&?g')"
+              export cpu2="cpu_selection\\=\\\"${cpu_youxuan}\\\""
+              sed -i "s?${cpu1}?${cpu2}?g" "${ARGET_PATH}"
+              
               export Continue_selecting="1"
               if [[ -n ${TARGET1} ]] && [[ -n ${PATHS1} ]]; then
                 sed -i "s?${TARGET1}?${TARGET2}?g" "${yml_path}"
