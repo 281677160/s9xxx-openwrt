@@ -152,7 +152,7 @@ jobs:
               
               export cpu1="$(grep "cpu_selection=" "${yml_path}" |sed 's/^[ ]*//g' |grep -v '^#' |awk '{print $(2)}' |sed 's?=?\\&?g' |sed 's?"?\\&?g')"
               export cpu2="cpu_selection\\=\\\"${cpu_youxuan}\\\""
-              sed -i "s?${cpu1}?${cpu2}?g" "${ARGET_PATH}"
+              sed -i "s?${cpu1}?${cpu2}?g" "${yml_path}"
               
               export Continue_selecting="1"
               if [[ -n ${TARGET1} ]] && [[ -n ${PATHS1} ]]; then
