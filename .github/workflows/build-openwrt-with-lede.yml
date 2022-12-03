@@ -120,7 +120,7 @@ jobs:
             export PATHS1="$(grep -Eo "\- '.*'" "${yml_path}" |sed 's/^[ ]*//g' |grep -v "^#" |awk 'NR==1')"
             export PATHS2="- '${COME_BACK}/start'"
             if [[ -n ${PATHS1} ]] && [[ -n ${PATHS2} ]]; then
-              sed -i "s?${PATHS1}?${PATHS2}?g" "${ARGET_PATH}"
+              sed -i "s?${PATHS1}?${PATHS2}?g" "${yml_path}"
             else
               echo "获取变量失败,请勿胡乱修改build-openwrt-with-lede.yml文件"
               exit 1
