@@ -119,7 +119,7 @@ jobs:
           cd ${GITHUB_WORKSPACE}
           export cpu_model=`cat /proc/cpuinfo  |grep 'model name' |gawk -F : '{print $2}' | uniq -c  | sed 's/^ \+[0-9]\+ //g'`
           echo "当前CPU型号：${cpu_model}"
-          if [[ `echo "${cpu_model}" |grep -Eoc "E5"` -eq '0' ]]; then
+          if [[ `echo "${cpu_model}" |grep -Eoc "E5"` -eq '1' ]]; then
             git clone -b main https://github.com/${{github.repository}}.git lede
             export yml_path="lede/.github/workflows/build-openwrt-with-lede.yml"
             export PATHS1="$(grep -Eo "\- '.*'" "${yml_path}" |sed 's/^[ ]*//g' |grep -v "^#" |awk 'NR==1')"
