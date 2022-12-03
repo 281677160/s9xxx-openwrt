@@ -107,10 +107,15 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           echo "status=success" >> ${GITHUB_OUTPUT}
+          if [[ -n "${{ github.event.inputs.cpu }}" ]]; then
+            echo "cpu_preferred=${{ github.event.inputs.cpu }}" >> $GITHUB_ENV
+          else
+            echo "cpu_preferred=true" >> $GITHUB_ENV
+          fi
           
       - name: CPU检测
-        if: github.event.inputs.cpu == 'true' && !cancelled()
         run: |
+          if: env.cpu_preferred == 'true' && !cancelled()
           cd ${GITHUB_WORKSPACE}
           export cpu_model=`cat /proc/cpuinfo  |grep 'model name' |gawk -F : '{print $2}' | uniq -c  | sed 's/^ \+[0-9]\+ //g'`
           echo "当前CPU型号：${cpu_model}"
@@ -129,7 +134,7 @@ jobs:
             mkdir -p ${COME_BACK}
             echo "$(date +%Y%m%d%H%M%S)" > ${COME_BACK}/start
             git add .
-            git commit -m "重新启动编译"
+            git commit -m "遭遇E5系列CPU-重新启动编译"
             git push --force "https://${{ secrets.GH_TOKEN }}@github.com/${{github.repository}}" HEAD:main
             exit 1
           fi
