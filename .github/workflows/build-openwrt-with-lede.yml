@@ -104,6 +104,7 @@ jobs:
           echo "status=success" >> ${GITHUB_OUTPUT}
           
       - name: CPU检测
+        if: github.event.inputs.cpu == 'true' && !cancelled()
         run: |
           cd ${GITHUB_WORKSPACE}
           export cpu_model=`cat /proc/cpuinfo  |grep 'model name' |gawk -F : '{print $2}' | uniq -c  | sed 's/^ \+[0-9]\+ //g'`
@@ -113,6 +114,12 @@ jobs:
             export yml_path="lede/.github/workflows/build-openwrt-with-lede.yml"
             export PATHS1="$(grep -Eo "\- '.*'" "${yml_path}" |sed 's/^[ ]*//g' |grep -v "^#" |awk 'NR==1')"
             export PATHS2="- '${COME_BACK}/start'"
+            if [[ -n ${PATHS1} ]] && [[ -n ${PATHS2} ]]; then
+              sed -i "s?${PATHS1}?${PATHS2}?g" "${ARGET_PATH}"
+            else
+              echo "获取变量失败,请勿胡乱修改build-openwrt-with-lede.yml文件"
+              exit 1
+            fi
             cd lede
             mkdir -p ${COME_BACK}
             echo "$(date +%Y%m%d%H%M%S)" > ${COME_BACK}/start
