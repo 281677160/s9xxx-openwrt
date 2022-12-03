@@ -12,7 +12,7 @@ on:
     branches:
       - main
     paths:
-      - 'router-config'
+      - 'router-config/lede-master/come-back/start'
   
   workflow_dispatch:
     inputs:
