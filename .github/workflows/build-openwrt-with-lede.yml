@@ -108,8 +108,10 @@ jobs:
           sudo -E apt-get -qq autoremove --purge
           sudo -E apt-get -qq clean
           sudo timedatectl set-timezone "${TZ}"
-          sudo mkdir -p /workdir
-          sudo chown ${USER}:${GROUPS} /workdir
+          sudo mkdir -p /workdirlede
+          sudo chown ${USER}:${GROUPS} /workdirlede
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
           echo "status=success" >> ${GITHUB_OUTPUT}
           if [[ -n "${{ github.event.inputs.cpu }}" ]]; then
             echo "cpu_preferred=${{ github.event.inputs.cpu }}" >> $GITHUB_ENV
@@ -144,12 +146,12 @@ jobs:
           fi
 
       - name: Clone source code
-        working-directory: /workdir
+        working-directory: /workdirlede
         if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
         run: |
           df -hT ${PWD}
           git clone --depth 1 ${REPO_URL} -b ${REPO_BRANCH} openwrt
-          ln -sf /workdir/openwrt ${GITHUB_WORKSPACE}/openwrt
+          ln -sf /workdirlede/openwrt ${GITHUB_WORKSPACE}/openwrt
 
       - name: Load custom feeds
         run: |
