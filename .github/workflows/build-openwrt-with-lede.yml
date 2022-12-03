@@ -134,7 +134,7 @@ jobs:
             mkdir -p ${COME_BACK}
             echo "$(date +%Y%m%d%H%M%S)" > ${COME_BACK}/start
             git add .
-            git commit -m "遭遇E5系列CPU-build openwrt with lede"
+            git commit -m "Skip_E5 build openwrt with lede"
             git push --force "https://${{ secrets.GH_TOKEN }}@github.com/${{github.repository}}" HEAD:main
             exit 1
           fi
