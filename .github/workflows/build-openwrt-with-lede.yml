@@ -16,11 +16,6 @@ on:
   
   workflow_dispatch:
     inputs:
-      cpu:
-        description: 'cpu优选,弃用E5系列CPU'
-        required: false
-        default: 'true'
-        type: boolean
       openwrt_board:
         description: "Select Amlogic board"
         required: false
@@ -60,15 +55,25 @@ on:
           - 5.10.135
           - 5.15.50
           - 6.0.1
+      openwrt_size:
+        description: "Set the rootfs size(Unit: MiB)."
+        required: false
+        default: "960"
       auto_kernel:
         description: "Auto use the latest kernel"
         required: false
         default: true
         type: boolean
-      openwrt_size:
-        description: "Set the rootfs size(Unit: MiB)."
+      cpu:
+        description: 'cpu优选,弃用E5系列CPU'
         required: false
-        default: "960"
+        default: 'true'
+        type: boolean
+      CACHE_ACCELERATE:
+        description: '缓存加速'
+        required: false
+        default: 'true'
+        type: boolean
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
@@ -157,6 +162,14 @@ jobs:
           chmod +x ${DIY_P2_SH}
           cd openwrt/
           ${GITHUB_WORKSPACE}/${DIY_P2_SH}
+          
+      - name: Accelerate
+        if: github.event.inputs.CACHE_ACCELERATE == 'true'
+        uses: stupidloud/cachewrtbuild@main
+        with:
+          ccache: 'true'
+          mixkey: 'lede'
+          prefix: ${{ github.workspace }}/openwrt
 
       - name: Download package
         id: package
